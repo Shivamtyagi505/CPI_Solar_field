@@ -1,0 +1,170 @@
+{
+  "version": "1.0.0",
+  "form_id": "cpi_site_commissioning",
+  "title": "Site Commissioning Form",
+  "subtitle": "Offline Field Capture — Solar PV Installations",
+  "sections": [
+    {
+      "id": "construction",
+      "code": "A",
+      "title": "Construction",
+      "description": "Foundation works, contractor mobilisation, and earthing installation",
+      "fields": [
+        {
+          "id": "contractor_mobilised_date",
+          "label": "Contractor Mobilised Date",
+          "type": "date",
+          "required": true,
+          "validation": [
+            { "rule": "not_future", "message": "Contractor Mobilised date cannot be in the future." }
+          ]
+        },
+        {
+          "id": "solar_foundation_start_date",
+          "label": "Solar Foundation — Start Date",
+          "type": "date",
+          "required": true,
+          "validation": [
+            { "rule": "not_future", "message": "Solar Foundation start date cannot be in the future." },
+            { "rule": "not_before_field", "field": "contractor_mobilised_date", "message": "Solar Foundation start date cannot be earlier than Contractor Mobilised date." }
+          ]
+        },
+        {
+          "id": "solar_foundation_end_date",
+          "label": "Solar Foundation — End Date",
+          "type": "date",
+          "required": true,
+          "validation": [
+            { "rule": "not_future", "message": "Solar Foundation end date cannot be in the future." },
+            { "rule": "not_before_field", "field": "solar_foundation_start_date", "message": "Solar Foundation end date cannot be earlier than Solar Foundation start date." }
+          ]
+        },
+        {
+          "id": "earthing_works",
+          "label": "Earthing Works",
+          "type": "radio",
+          "options": [
+            { "label": "Yes", "value": "Yes" },
+            { "label": "No", "value": "No" }
+          ],
+          "required": true
+        },
+        {
+          "id": "earthing_type",
+          "label": "Type of Earthing",
+          "type": "select",
+          "options": ["Chemical", "Pipe", "Spike"],
+          "required": true,
+          "visible_when": { "field": "earthing_works", "equals": "Yes" }
+        },
+        {
+          "id": "earthing_nos",
+          "label": "Earthing Nos",
+          "type": "select",
+          "options": [1, 2, 3],
+          "required": true,
+          "visible_when": { "field": "earthing_works", "equals": "Yes" }
+        }
+      ]
+    },
+    {
+      "id": "utility_installation",
+      "code": "B",
+      "title": "Utility Installation",
+      "description": "Energy Storage System (ESS) & Solar PV Array configuration",
+      "fields": [
+        {
+          "id": "ess_installed",
+          "label": "ESS (Energy Storage System)",
+          "type": "radio",
+          "options": [
+            { "label": "Yes", "value": "Yes" },
+            { "label": "No", "value": "No" }
+          ],
+          "required": true
+        },
+        {
+          "id": "no_of_ess_installed",
+          "label": "No of ESS Installed",
+          "type": "select",
+          "options": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "required": true,
+          "visible_when": { "field": "ess_installed", "equals": "Yes" }
+        },
+        {
+          "id": "ess_units",
+          "label": "ESS Unit Details",
+          "type": "repeater",
+          "visible_when": { "field": "ess_installed", "equals": "Yes" },
+          "count_field": "no_of_ess_installed",
+          "item_title_prefix": "ESS Unit #",
+          "subfields": [
+            { "id": "make", "label": "Make", "type": "text", "placeholder": "e.g. Huawei, BYD, Growatt", "required": true },
+            { "id": "serial_no", "label": "Serial No", "type": "text", "placeholder": "e.g. SN-88291039", "required": true }
+          ]
+        },
+        {
+          "id": "panel_capacity",
+          "label": "Panel Capacity (Wp)",
+          "type": "select",
+          "options": [575, 580, 585, 590, 600],
+          "required": true
+        },
+        {
+          "id": "number_of_solar_panels",
+          "label": "Number of Solar Panels",
+          "type": "number",
+          "min": 1,
+          "step": 1,
+          "placeholder": "e.g. 12",
+          "required": true
+        },
+        {
+          "id": "solar_pv_capacity",
+          "label": "Solar PV Capacity (kWp)",
+          "type": "computed",
+          "read_only": true,
+          "formula": "(panel_capacity * number_of_solar_panels) / 1000",
+          "format": "decimals:2",
+          "helper_text": "Computed automatically as (Panel Capacity × Number of Panels) ÷ 1000"
+        }
+      ]
+    },
+    {
+      "id": "photos",
+      "code": "C",
+      "title": "Photos",
+      "description": "Field visual documentation. Tap to mark each slot as captured.",
+      "photo_groups": [
+        {
+          "group_id": "foundation_photos",
+          "group_title": "Foundation",
+          "slots": [
+            { "id": "photo_excavation", "label": "Excavation" },
+            { "id": "photo_steel_binding", "label": "Steel Binding" },
+            { "id": "photo_raft_column", "label": "Raft / Column" },
+            { "id": "photo_bolts_pedestal", "label": "Bolts / Pedestal" }
+          ]
+        },
+        {
+          "group_id": "structure_photos",
+          "group_title": "Structure",
+          "slots": [
+            { "id": "photo_struct_front", "label": "Front" },
+            { "id": "photo_struct_side", "label": "Side" }
+          ]
+        },
+        {
+          "group_id": "earthing_photos",
+          "group_title": "Earthing",
+          "visible_when": { "field": "earthing_works", "equals": "Yes" },
+          "dynamic_slots": {
+            "source_field": "earthing_nos",
+            "prefix": "EP",
+            "label_template": "Earthing Point {i} (EP{i})"
+          }
+        }
+      ]
+    }
+  ]
+}
